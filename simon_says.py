@@ -14,7 +14,10 @@ import pyttsx4
 engine = pyttsx4.init()
 
 # starting number of colors
-list_length = 4
+start_list_length = 4
+
+# starting number of colors
+list_length = start_list_length
 
 # set up ports for Phidget
 greenButton = DigitalInput()
@@ -71,8 +74,10 @@ while(True):
         # blink the LEDs
         blink_colors(list_of_colors)
       
+        # holds LEDs that player chooses        
         list_of_player_colors = []
-        # continue until player pushes number of buttons equivalent to list_length
+        
+        # continue until player either wins or loses
         while True:
             # append colors to list_of_player_colors
             if(greenButton.getState()==False and green_was_on_high):
@@ -88,16 +93,19 @@ while(True):
             # check if won
             if (list_of_player_colors==list_of_colors):
                 print("Success")
+                print("Press red button to continue to next level!")
                 engine.say("Success. Press red button to continue to next level!")
                 engine.runAndWait()
-                print("Press red button to continue to next level!")
                 while(redButton.getState()==False):
                     continue
+                list_length+=1
+                break
             # check if lost
             elif any([list_of_player_colors[led]!=list_of_colors[led] for led in range(len(list_of_player_colors))]):
                 print("Failure")
                 print("Restarting...")
                 engine.say("Failure...Restarting!")
                 engine.runAndWait()
+                # restart, go back to starting level
+                list_length = start_list_length
                 break
-            list_length+=1
